@@ -2,24 +2,31 @@ var userIDCounter = 0;
 var registeredUserList = [];
 var loginAjax = new XMLHttpRequest();
 var storeAjax = new XMLHttpRequest();
+
 ///////////////////USER LOGIN /////////////////
 function checkUser(object) {
     loginAjax.open("POST", "http://localhost:3000/getUser");
     loginAjax.setRequestHeader("Content-Type", "application/json");
     loginAjax.send(JSON.stringify(object));
 }
+
 function checkEmailPresent(mail, pass) {
     checkUser({ mail, pass });
     loginAjax.onreadystatechange = function () {
         if (loginAjax.readyState == 4 && loginAjax.status == 200) {
             var statusRes = loginAjax.responseText;
-            if (statusRes) {
+            if (statusRes != "false") {
                 window.location.replace('./component/add to cart/addToCart.html');
                 sessionStorage.setItem("userSessionKey", statusRes);
+            }
+            else {
+                /* TODO: Make proper UI for credentials */
+                console.log("Wrong Credentials");
             }
         }
     };
 }
+
 function loginUser() {
     var Email = document.getElementById("loginEmail");
     var Password = document.getElementById("loginPassword");
@@ -27,10 +34,11 @@ function loginUser() {
         alert("Fill the empty fieldset.");
         (Email.value == "") ? Email.focus() : Password.focus();
     }
-    else{
-        checkEmailPresent(Email.value,Password.value);
+    else {
+        checkEmailPresent(Email.value, Password.value);
     }
 }
+
 ////////////////// Register ///////////////////
 function storeUserArray(object) {
     storeAjax.open("POST", "http://localhost:3000/postUser");
@@ -65,6 +73,7 @@ function addNewUser() {
         storeUserArray(userObject);
     }
 }
+
 function checkUserName(name) {
     var exp = /[0-9]/g;
     var result = name.match(exp) || [];

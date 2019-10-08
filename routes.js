@@ -11,16 +11,17 @@ router.post("/getUser", function (req, res) {
         Email: req.body.mail,
         Password: req.body.pass
     })
-        .then((data) => {
-            if (data.length) {
-                res.send(data[0]);
-            }
-            else res.send(false);
-            res.end();
-        })
-        .catch((err) => {
-            console.log("Error While adding User: ", err);
-        });
+    .then((data) => {
+        if (data.length) {
+            res.end(JSON.stringify(data[0]));
+        }
+        else
+            res.end("false");
+    })
+    .catch((err) => {
+        console.log("Error While logging in User: ", err);
+        res.end("false");
+    });
 });
 
 router.post("/postUser", function (req, res) {
@@ -30,13 +31,13 @@ router.post("/postUser", function (req, res) {
         Password: req.body.Password,
         Email: req.body.Email
     })
-        .then((err) => {
-            console.log(err);
-            res.send('User registered');
-        })
-        .catch((err) => {
-            console.log("Error While adding User: ", err);
-        });
+    .then((data) => {
+        res.end("User registered");  
+    })
+    .catch((err) => {
+        console.log("Error While adding User: ", err);
+        res.end();
+    })
 });
 
 /////////////////// Requests - for products //////////////

@@ -15,7 +15,7 @@ mongoose.connect("mongodb://localhost:27017/eKart", { useNewUrlParser: true ,use
     console.error("Error while connecting to Database: ", err);
 });
 
-app.use(morgan('short'));
+app.use(morgan('dev'));
 app.use(parser.json());
 app.use(express.static('./public'));
 app.use('/',routes);
