@@ -42,13 +42,12 @@ router.post("/postUser", function (req, res) {
 
 /////////////////// Requests - for products //////////////
 router.get('/getProduct', (req, res) => {
-    product.find({
-
-    }).then((data) => {
-        res.send(data);
-        res.end();
+    product.find({})
+    .then((data) => {
+        res.end(JSON.stringify(data));
     }).catch((err) => {
         console.log(err);
+        res.end("[]");
     })
 });
 router.post('/postProduct', (req, res) => {
@@ -58,12 +57,13 @@ router.post('/postProduct', (req, res) => {
         Quantity: req.body.Quantity,
         Price: req.body.Price,
     })
-        .then(() => {
-            res.send("File Saved");
-        })
-        .catch((err) => {
-            console.log(err);
-        });
+    .then(() => {
+        res.end("[]");
+    })
+    .catch((err) => {
+        console.log(err);
+        res.end("[]");
+    });
 });
 router.post('/updateProduct', (req, res) => {
     product.updateOne({
@@ -75,16 +75,22 @@ router.post('/updateProduct', (req, res) => {
             Quantity: req.body.Quantity,
             Price: req.body.Price,
         }).then(() => {
-            res.send('Done');
-            res.end();
+            res.end("[]");
+        })
+        .catch((err) => {
+            console.log(err);
+            res.end("[]");
         });
 });
 router.post('/deleteProduct', (req, res) => {
     product.deleteOne({
         _id: req.body._id
     }).then(() => {
-        res.send('Done');
-        res.end();
+        res.end("[]");
+    })
+    .catch((err) => {
+        console.log(err);
+        res.end("[]");
     });
 });
 
@@ -95,12 +101,18 @@ router.post('/getCart', (req, res) => {
     })
         .then((data) => {
             if (data.length) {
-                res.send(data[0]);
+                res.end(JSON.stringify(data[0]));
             }
-            else res.send({ bool: "false" });
+            else
+                res.end(JSON.stringify({
+                    bool: "false"
+                }));
         })
         .catch((err) => {
             console.log(err);
+            res.end(JSON.stringify({
+                bool: "false"
+            }));
         });
 });
 router.post('/postCartForNew', (req, res) => {
@@ -116,12 +128,11 @@ router.post('/postCartForNew', (req, res) => {
         }
     })
         .then(() => {
-            res.send("File Saved");
-            res.end();
+            res.end("File Saved");
         })
         .catch((err) => {
             console.log(err);
-            res.send("Error");
+            res.end("Error");
         });
 });
 router.post('/postCart', (req, res) => {

@@ -78,7 +78,6 @@ function createProductPanel(newP, index, PrId) {
         productQuantity.setAttribute("placeholder", "Enter Quantity of Product");
         productPrice.setAttribute("placeholder", "Enter A Product Price");
     } else {
-
         document.getElementById("pName").value = product[index].Name;
         document.getElementById("pDesc").value = product[index].Description;
         document.getElementById("pQuantity").value = product[index].Quantity;
