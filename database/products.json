@@ -1,0 +1,32 @@
+{
+    "product": [
+        {
+            "Name": "C++",
+            "Description": "Book:Let us C++",
+            "Quantity": 19,
+            "Price": "750",
+            "ProductID": 1
+        },
+        {
+            "Name": "Geometry",
+            "Description": "Classmate galaxy geometry",
+            "Quantity": 37,
+            "Price": "375",
+            "ProductID": 2
+        },
+        {
+            "Name": "Pen",
+            "Description": "Ball Pen",
+            "Quantity": 87,
+            "Price": "15",
+            "ProductID": 3
+        },
+        {
+            "Name": "Laptop",
+            "Description": "Asus A555LF",
+            "Quantity": 20,
+            "Price": "35000",
+            "ProductID": 4
+        }
+    ]
+}

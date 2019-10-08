@@ -1,0 +1,17 @@
+.login-form{
+    max-width:500px;
+    justify-content: space-around;
+    align-items: center;
+    padding: 10px;
+    left: 0;
+    margin: auto;
+    margin-top:40px;
+}
+.login-form a{
+    left:0;
+    top: 0;
+    margin: auto;
+}
+.register-form{
+    
+}

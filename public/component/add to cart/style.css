@@ -1,0 +1,81 @@
+*{
+	margin: 0;
+	padding: 0;
+    box-sizing: border-box;
+    font-family: sans-serif;
+}
+#div-main{
+    display: flex;
+    font-family: sans-serif;background-image: linear-gradient(45deg, #93a5cf 0%, #e4efe9 100%);
+    top:0;
+	left: 0;padding: 3px;
+	right: 0;
+	margin:25vh auto;width: 500px;
+    border:1px solid #000000;border-radius: 5px;
+    box-shadow: 2px 2px 20px black;
+}
+input[type=number]{
+    padding:5px;
+    width:200px;
+    border-radius:6px;
+    border:0.5px solid grey;
+}
+input[type=submit]{
+    color:black;float: right; padding: 3px;
+    background: white;transition:0.3s;border:1px solid #000000;border:1px solid grey;
+}
+input[type=submit]:hover{
+    color:white;transition:0.3s;
+    background: #000;
+}
+#listProductId{
+    padding: 3px;
+    width: 70%; border:1px solid #000000;
+    padding-right:12px;
+}
+#divCart{
+    width:30%;border:1px solid #000000;border:1px solid black;
+    margin: 0 0 0 4px;padding: 3px; 
+}
+.divCart-one{
+    background:  #f5ead0;border:1px solid #000000;border:1px solid black;
+    height: 35%;margin-bottom: 55px;padding: 3px;
+}
+#divCart a{
+    color: #000;margin: 15px;
+}
+.name-user{
+    height:10vh;
+    width: 100%;
+    padding: 14px;
+    background: #013f79;
+    color: white;
+    top: 0;
+    position: absolute;
+    z-index: 8;
+}
+.name-user div{
+    width: 300px;
+    position: relative;
+    left: 0;
+    top: 0;
+    margin: auto;
+    float: left;
+    text-transform: capitalize;
+}
+.name-user button{
+    position: relative;
+    color: white;
+    width: 70px;
+    padding: 10px;
+    background: #0298ca;
+    border-radius: 20px;
+    border:none;
+    float: right;
+    transition: 0.4s;
+}
+.name-user button:hover{
+    transform: scale(1.1);transition: 0.2s;
+    background:#0298ca;
+    box-shadow: 1px 1px 8px black;
+}

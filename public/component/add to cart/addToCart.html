@@ -1,0 +1,27 @@
+<html lang="en">
+<head>
+    <title>PAGE-2</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body onload="updateEverything()" style="height:100vh; background:#b3dafe;">
+    <div class="name-user" >
+        <div><h4 style="margin:7px">Hi , <a id="aUserName" ></a></h4></div>
+        <div style="float: right; position: relative;"><button onclick="logout()" id="logout-btn">Logout</button></div>
+    </div>
+    <div id="div-main">
+        <div id = "listProductId">
+            <h3 style="text-align: center;">Bucket List</h3>
+
+        </div>
+        <div id="divCart">
+                <div class="divCart-one">
+                <i class="fa fa-shopping-cart" style="font-size:50px;margin: 0 35px;" aria-hidden="true"></i>
+                <label id="itemCount">Items in cart : 0</label>
+                </div>
+                <a href="../checkOut/checkOut.html" target="_blank">View cart list</a>
+        </div>
+    </div>
+<script src="addToCart.js"></script>
+</body>
+</html>

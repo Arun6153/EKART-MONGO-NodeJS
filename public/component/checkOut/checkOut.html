@@ -1,0 +1,28 @@
+<html lang="en">
+<head>
+    <title>PAGE 3</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body onload="updateEverything()" style="background:#141414;">
+    <div class="name-user" >
+        <div><h4>Hi , <a id="aUserName" ></a></h4></div>
+        <button onclick="logout()" id="logout-btn">Logout</button>
+    </div>
+    <div id="div-main">
+        <div id = "cartlistProductId">
+            <h3 style="text-align: center;">Items in a cart</h3>
+
+        </div>
+        <div id="divCart">
+                <div class="divCart-one">
+                <i class="fa fa-shopping-cart" style="font-size:50px;margin: 0 35px;" aria-hidden="true"></i>
+                <label id="itemCount">Items in cart : 0</label>
+                </div>
+                <a href="#" id="checkoutButton" onclick="saveEverything()">check out</a>
+                <center><span id="bill" style="font-size: 15px;" ><b>Bill :</b>0</span></center>
+                </div>
+    </div>
+<script src="checkOut.js"></script>
+</body>
+</html>
