@@ -22,8 +22,8 @@ const cart = new Schema({
         Description: String,
         Quantity: Number,
         Price: Number,
-        ProductId:String
-    },]
+        ProductId: String
+    }]
 });
 
 module.exports.userModel = mongoose.model("Users", user, "Users");

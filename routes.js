@@ -81,6 +81,7 @@ router.post('/updateProduct', (req, res) => {
             console.log(err);
             res.end("[]");
         });
+    res.end();
 });
 router.post('/deleteProduct', (req, res) => {
     product.deleteOne({
@@ -101,62 +102,47 @@ router.post('/getCart', (req, res) => {
     })
         .then((data) => {
             if (data.length) {
-                res.end(JSON.stringify(data[0]));
+                res.end(JSON.stringify(data));
             }
             else
-                res.end(JSON.stringify({
-                    bool: "false"
-                }));
+            res.end("[]");
         })
         .catch((err) => {
             console.log(err);
-            res.end(JSON.stringify({
-                bool: "false"
-            }));
+            res.end("[]");
         });
 });
 router.post('/postCartForNew', (req, res) => {
-    console.log(req.body);
     cart.create({
         Email: req.body.Email,
-        Product: {
-            Name: req.body.Product.Name,
-            Description: req.body.Product.Description,
-            Quantity: req.body.Product.Quantity,
-            Price: req.body.Product.Price,
-            ProductId: req.body.Product.ProductId
-        }
+        Product: req.body.Product
     })
-        .then(() => {
-            res.end("File Saved");
-        })
-        .catch((err) => {
-            console.log(err);
-            res.end("Error");
-        });
-});
-router.post('/postCart', (req, res) => {
-    console.log(req.body);
-    cart.updateOne({
-        Email: req.body.Email
-    }, {
-        $push: {
-            Product: {
-                Name: req.body.Product.Name,
-                Description: req.body.Product.Description,
-                Quantity: req.body.Product.Quantity,
-                Price: req.body.Product.Price,
-                ProductId: req.body.Product.ProductId
-            }
-        }
-    }).then(() => {
-        console.log('done');
-        res.send();
-    }).catch((err) => {
+    .then(() => {
+        res.end("[]");
+    })
+    .catch((err) => {
         console.log(err);
-        res.end();
+        res.end("[]");
     });
 });
+
+router.post('/postCart', (req, res) => {
+    for (var i = 0; i < req.body.length; i++) {
+        console.log(req.body[i].Product)
+        cart.updateOne({
+            Email: req.body[i].Email
+        }, {
+            Product: req.body[0].Product
+        }).then(() => {
+            console.log('done');
+        }).catch((err) => {
+            console.log(err);
+            res.end();
+        });
+    }
+    res.end();
+});
+
 ////////////////////////
 router.get('/getOriginalCart', (req, res) => {
     res.sendFile("originalCart.json", { root: "./database/" });
@@ -165,9 +151,6 @@ router.post('/postOriginalCart', (req, res) => {
     res.writeFileSync("./database/originalCart.json", JSON.stringify(req.body));
     res.send("File Saved");
 });
-
-
-
 
 ////////////////////////
 module.exports = router;

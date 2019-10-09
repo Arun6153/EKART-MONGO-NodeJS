@@ -1,17 +1,22 @@
 var divListProductID = document.getElementById("listProductId");
 var productObjArrayForId = [];
-var userCart = {};
+var userCart = [];
 var oldCheck = true;
 var cartListCount = document.getElementById("itemCount");
 ////////////// AJAX //////////////////
 var cartXttp = new XMLHttpRequest();
 var productXttp = new XMLHttpRequest();
+var updateProductXttp = new XMLHttpRequest();
+var getCartXttp = new XMLHttpRequest();
+var cartNewXttp = new XMLHttpRequest();
 var userSession = JSON.parse(sessionStorage.getItem("userSessionKey"));
 
 
 /////////////////////////////////////
 function updateEverything() {
-    getStoredProducts();
+    productXttp.open("GET", "http://localhost:3000/getProduct");
+    productXttp.setRequestHeader("Content-Type", "application/json");
+    productXttp.send();
     productXttp.onreadystatechange = function () {
         if (productXttp.readyState == 4 && productXttp.status == 200) {
             productObjArrayForId = JSON.parse(productXttp.responseText);
@@ -23,48 +28,47 @@ function updateEverything() {
         }
     };
 }
+
 function getUserCartFromLocalStorage(Email) {
-    cartXttp.open("POST", "http://localhost:3000/getCart");
-    cartXttp.setRequestHeader("Content-Type", "application/json");
-    cartXttp.send(JSON.stringify({ Email }));
-    cartXttp.onreadystatechange = function () {
-        if (cartXttp.status == 200 && cartXttp.readyState == 4) {
-            userCart = JSON.parse(cartXttp.responseText);
-            if (userCart.bool!="false") {
+    getCartXttp.open("POST", "http://localhost:3000/getCart");
+    getCartXttp.setRequestHeader("Content-Type", "application/json");
+    getCartXttp.send(JSON.stringify({ Email }));
+    getCartXttp.onreadystatechange = function () {
+        if (getCartXttp.status == 200 && getCartXttp.readyState == 4) {
+            userCart = JSON.parse(getCartXttp.responseText);
+            console.log(userCart)
+            if (!userCart.length) {
                 oldCheck = false;
-                cartListCount.innerHTML = "Items in cart : " + userCart.Product.length;
             }
             else {
-                userCart={};
-                console.log("Yeah Baby");
+                cartListCount.innerHTML = userCart[0].Product.length;
             }
         }
     };
 }
-function getStoredProducts() {
-    productXttp.open("GET", "http://localhost:3000/getProduct");
-    productXttp.setRequestHeader("Content-Type", "application/json");
-    productXttp.send();
-}
+
 function storeProducts(product) {
-    productXttp.open("POST", "http://localhost:3000/postProduct");
-    productXttp.setRequestHeader("Content-Type", "application/json");
-    productXttp.send(JSON.stringify(product));
+    var Product = product;
+    updateProductXttp.open("POST", "http://localhost:3000/updateProduct");
+    updateProductXttp.setRequestHeader("Content-Type", "application/json");
+    updateProductXttp.send(JSON.stringify(Product));
 }
-function storeProductsAddedToCart(cart) {
-    console.log(cart);
+
+function storeProductsAddedToCart() {
+    var cart = userCart;
     if(oldCheck){
-        oldCheck=false;
         cartXttp.open("POST", "http://localhost:3000/postCart");
         cartXttp.setRequestHeader("Content-Type", "application/JSON");
         cartXttp.send(JSON.stringify(cart));
     }
     else{
-        cartXttp.open("POST", "http://localhost:3000/postCartForNew");
-        cartXttp.setRequestHeader("Content-Type", "application/JSON");
-        cartXttp.send(JSON.stringify(cart));
+        oldCheck = true;
+        cartNewXttp.open("POST", "http://localhost:3000/postCartForNew");
+        cartNewXttp.setRequestHeader("Content-Type", "application/JSON");
+        cartNewXttp.send(JSON.stringify(cart[cart.length-1]));
     }
 }
+
 function addToDomOfProductID(objectP) {
     //////// Product ID div //////////
     var divForProduct = document.createElement("div");
@@ -78,6 +82,13 @@ function addToDomOfProductID(objectP) {
     divForProduct.style.margin = "4px";
 
     //////// Adding Product Id ////////
+    var titleProductName = document.createElement("a");
+    titleProductName.innerHTML = "<b>Product Name : </b>";
+    divForProduct.appendChild(titleProductName);
+    var valProductName = document.createTextNode(objectP.Name);
+    divForProduct.appendChild(valProductName);
+    addSpaceLine(divForProduct);
+
     var titleProductId = document.createElement("a");
     titleProductId.innerHTML = "<b>Product Id : </b>";
     divForProduct.appendChild(titleProductId);
@@ -96,7 +107,7 @@ function addToDomOfProductID(objectP) {
 
     ////////// Add To Cart Button ///////
     var cartBtn = document.createElement("input");
-    cartBtn.setAttribute("type", "submit");
+    cartBtn.setAttribute("type", "button");
     cartBtn.setAttribute("value", "Add To ->");
     divForProduct.appendChild(cartBtn);
     cartBtn.style.marginBottom = "2px";
@@ -109,36 +120,39 @@ function addToDomOfProductID(objectP) {
             alert("Don't leave field empty");
             idOfField.focus();
         }
-        if (!checkValue(idOfField.value, objectP.Quantity)) {
+        else if (!checkValue(idOfField.value, objectP.Quantity)) {
             idOfField.focus();
         }
         else {
             titleProductQuantity.innerHTML = "<b>Product Quantity : </b>" + (objectP.Quantity - idOfField.value);
             var productIndex = getIndexOfArray(objectP._id);
             productObjArrayForId[productIndex].Quantity = objectP.Quantity - idOfField.value;
-            if (Object.keys(userCart).length) {
-                console.log(userCart);
-                userCart = (returnUpdatedCartObj((productObjArrayForId[productIndex]), idOfField.value), userSession.Email);
-            }
-            else {
+            // if (Object.keys(userCart).length) {
+            //     console.log(userCart);
+            //     userCart = (returnUpdatedCartObj((productObjArrayForId[productIndex]), idOfField.value), userSession.Email);
+            // }
+            //else {
                 let index = getIndexOfProductInCart(objectP._id);
                 if ( index == -1) {
-                    userCart.Product.push(returnUpdatedCartObj((productObjArrayForId[productIndex]), idOfField.value,userSession.Email));
+                    if (!userCart.length)
+                        userCart.push(returnUpdatedCartObj((productObjArrayForId[productIndex]), idOfField.value, userSession.Email));
+                    else {
+                        var obj = returnUpdatedCartObj((productObjArrayForId[productIndex]), idOfField.value, userSession.Email)
+                        userCart[0].Product.push(obj.Product[0]);
+                    }
+                    cartListCount.innerHTML = parseInt(parseInt(cartListCount.innerHTML) + 1);
                 }
                 else {
-                    userCart.Product[index].Quantity += parseInt(idOfField.value);
+                    userCart[0].Product[index].Quantity = parseInt(parseInt(userCart[0].Product[index].Quantity) + parseInt(idOfField.value));
                 }
-            }
-
-            storeProductsAddedToCart(userCart);
-            storeProducts(productObjArrayForId);
-            if(userCart.Product.length)
-                cartListCount.innerHTML = "Items in cart : " + userCart.Product.length;
-            else cartListCount.innerHTML = "Items in cart : " + 0;
+            //}
+            storeProductsAddedToCart();
+            storeProducts(objectP);
             idOfField.value = "";
         }
     });
 }
+
 function returnUpdatedCartObj(obj,quantity, mail) {
     
     var Email = mail;
@@ -146,10 +160,11 @@ function returnUpdatedCartObj(obj,quantity, mail) {
     var Description = obj.Description;
     var Quantity =quantity;
     var Price = obj.Price;
-    var ProductID = obj._id;
+    var ProductId = obj._id;
 
-    return { Email, Product: { Name, Description, Quantity, Price, ProductID } };
+    return { Email, Product: [{ Name, Description, Quantity, Price, ProductId }] };
 }
+
 function getIndexOfArray(id) {
     for (var i = 0; i < productObjArrayForId.length; i++) {
         if (productObjArrayForId[i]._id == id) {
@@ -157,15 +172,17 @@ function getIndexOfArray(id) {
         }
     }
 }
+
 function getIndexOfProductInCart(id) {
-    console.log(userCart);
-    if(userCart) return -1;
-    for (var i = 0; i < userCart.Product.length; i++)
-        if (userCart.Product[i]._id == id) {
+    if (!userCart.length)
+        return -1
+    for (var i = 0; i < userCart[0].Product.length; i++)
+        if (userCart[0].Product[i].ProductId == id) {
             return i;
         }
     return -1;
 }
+
 function checkValue(newVal, oldVal) {
     if (oldVal - newVal < 0 || newVal < 1) {
         alert("Enter a valid Quantity");
@@ -173,11 +190,13 @@ function checkValue(newVal, oldVal) {
     }
     else return true;
 }
+
 function addSpaceLine(spaceP) {
     var sp = document.createElement("br");
     spaceP.appendChild(sp);
 }
+
 function logout() {
-    location.assign('../../Login.html');
+    location.assign('../../index.html');
     sessionStorage.removeItem("userSessionKey");
 }
