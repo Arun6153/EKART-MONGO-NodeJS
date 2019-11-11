@@ -89,14 +89,9 @@ function addToDomOfProduct(objectP)
 {
     var userId = 0;
     var divForProduct = document.createElement("div");
+    var divForProduct = document.createElement("div");
     divCartList.appendChild(divForProduct);
-    divForProduct.style.width       = "100%";
-    divForProduct.style.border      = "1px";
-    divForProduct.style.borderStyle = "solid";
-    divForProduct.style.borderColor = "black";
-    divForProduct.style.padding     = "2px";
-    divForProduct.style.padding     = "2px";
-    divForProduct.style.margin      = "4px";
+    divForProduct.setAttribute("id","div-list");
 
     //////// Adding Product in Div //////////
     var productId       = document.createElement("label");
@@ -115,15 +110,14 @@ function addToDomOfProduct(objectP)
     addSpaceLine(divForProduct);
     productQuantity.innerHTML = "<b>Quantity :</b>"+objectP.Quantity+" units";
     divForProduct.appendChild(productQuantity);
+    
     ////////// DELETE BUTTON ////////////
     var deleteBtn = document.createElement("input");
-    deleteBtn.setAttribute("type", "submit");
+    deleteBtn.setAttribute("type", "button");
     deleteBtn.setAttribute("value", "Delete");
     divForProduct.appendChild(deleteBtn);
-    deleteBtn.style.cssFloat     = "right";
-    deleteBtn.style.marginBottom = "2px";
-    deleteBtn.style.marginTop    = "-28px";
     /////////// Delete operation ////////
+    
     deleteBtn.addEventListener("click",function(e){
         var target = e.target;
         var productNo = findProduct(target.parentNode.childNodes[0].childNodes[1].nodeValue);

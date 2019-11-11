@@ -73,13 +73,7 @@ function addToDomOfProductID(objectP) {
     //////// Product ID div //////////
     var divForProduct = document.createElement("div");
     divListProductID.appendChild(divForProduct);
-    divForProduct.style.width = "100%";
-    divForProduct.style.border = "1px";
-    divForProduct.style.borderStyle = "solid";
-    divForProduct.style.borderColor = "black";
-    divForProduct.style.padding = "2px";
-    divForProduct.style.padding = "2px";
-    divForProduct.style.margin = "4px";
+    divForProduct.setAttribute("id","div-list");
 
     //////// Adding Product Id ////////
     var titleProductName = document.createElement("a");
@@ -103,15 +97,13 @@ function addToDomOfProductID(objectP) {
     fieldProductQuantity.setAttribute("type", "number");
     fieldProductQuantity.setAttribute("placeholder", "Enter Quantity Needed");
     fieldProductQuantity.setAttribute("id", "Q" + objectP._id);
-    divForProduct.appendChild(fieldProductQuantity);
 
     ////////// Add To Cart Button ///////
     var cartBtn = document.createElement("input");
     cartBtn.setAttribute("type", "button");
-    cartBtn.setAttribute("value", "Add To ->");
+    cartBtn.setAttribute("value", "Add To Cart  >>");
     divForProduct.appendChild(cartBtn);
-    cartBtn.style.marginBottom = "2px";
-    cartBtn.style.marginTop = "-15px";
+    divForProduct.appendChild(fieldProductQuantity);
     ////////// Add To Button Operation /////
 
     cartBtn.addEventListener("click", function () {

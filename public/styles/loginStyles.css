@@ -2,16 +2,35 @@
     max-width:500px;
     justify-content: space-around;
     align-items: center;
-    padding: 10px;
-    left: 0;
-    margin: auto;
+    padding:20px 10px;
     margin-top:40px;
+    border: 1px solid #141414;
+    box-shadow: 1px 6px 12px -2px black;
 }
 .login-form a{
     left:0;
     top: 0;
     margin: auto;
 }
-.register-form{
-    
+.div-form{
+    width: 45%;
+    height: 100vh;
+    float: left;
+    padding: 50px;
+    background: white;
+    border: 3px solid #114411;
+}
+.back-form{
+    width:55%;
+    height: 100vh;
+    float: right;
+    position: relative;
+    background: #114411;
+}
+.title{
+    font-weight: bold;transition: 0.4s;
+    width: 100px;
+}
+.title:hover{
+    transform: translate(0,-4px);
 }

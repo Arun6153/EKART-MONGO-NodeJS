@@ -1,64 +1,129 @@
-*{
-	margin: 0;
-	padding: 0px;
+* {
+    margin: 0;
+    padding: 0;
     box-sizing: border-box;
     font-family: sans-serif;
 }
-#div-main{
+
+body {
+    width: all;
+    height: auto;
+    background: #b3dafe;
+    overflow-x: hidden;
+}
+
+#div-main {
     display: flex;
-    font-family: sans-serif;background-image: linear-gradient(45deg, #93a5cf 0%, #e4efe9 100%);
-    top:0;
-	left: 0;
-	right: 0;
-	margin:25vh auto;width: 500px;padding: 3px;
-    border:1px solid #000000;border-radius: 5px;
-    box-shadow: 0px 6px 12px -6px white;
+    font-family: sans-serif;
+    background: white;
+    position: relative;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: 3px;
+    margin: 10px auto;
+    width: 720px;
+    border: 1px solid #000000;
+    border-radius: 5px;
+    box-shadow: 2px 2px 20px black;
 }
-input[type=submit]{
-    color:black;float: right;padding: 3px;
-    background: white;transition:0.3s;border:1px solid grey;
+
+#div-list {
+    width: 98.5%;
+    height: 14vh;
+    border: 1px solid black;
+    padding: 2px;
+    overflow: hidden;
+    margin: 4px 8px 4px 4px;
 }
-input[type=submit]:hover{
-    color:white;transition:0.3s;
-    background: #000;border-color: #000000;
+
+#div-list a {
+    line-height: 23px;
+}
+
+input[type=number] {
+    padding: 5px;
+    width: 180px;
+    height: auto;
+    float: right;
+    border: 2px solid #141414;
+}
+input[type=button] {
+    border:none;
+    padding: 7px 4px;
+    margin-left:5px ;
+    float: right;
+    transition: 0.2s;
+}
+input[type=button]:hover{
+    background: #013f79;
+    color: #ffffff;
+    transition: 0.2s;
+}
+#listProductId {
+    width: 70%;
+    border: 1px solid #000000;
+    padding-right: 8px;
+    overflow: hidden;
+}
+
+.divCart-one {
+    background: #f5ead0;
+    border: 1px solid #000000;
+    height: 30%;
+    margin-bottom: 55px;
+    padding: 28px 40px;
+    font-weight: lighter;
+}
+
+#divCart {
+    width: 30%;
+    border: 1px solid #000000;
+    border: 1px solid black;
+    margin: 0 0 0 4px;
+    padding: 3px;
+}
+
+#divCart a {
+    color: #000;
+    text-align: center;
+}
+.name-user {
+    height: 10vh;
+    width: 100%;
+    padding: 14px;top:0;
+    background: #013f79;
+    color: white;
+    position: sticky;
+    z-index: 8;
+}
+
+.name-user div {
+    width: 300px;
+    position: relative;
+    float: left;
+    text-transform: capitalize;
+}
+
+.name-user button {
+    position: relative;
+    color: white;
+    width: 70px;
+    padding: 10px;
+    background: #0298ca;
+    border-radius: 20px;
+    border: none;
+    float: right;
+    transition: 0.4s;
+}
+
+.name-user button:hover {
+    transform: scale(1.1);
+    transition: 0.2s;
+    background: #0298ca;
+    box-shadow: 1px 1px 8px black;
 }
 #cartlistProductId{
     width: 70%; border:1px solid #000000;
     padding-right:12px;padding: 3px;
-}
-#divCart{
-    width:30%;border:1px solid #000000;
-    margin: 0 0 0 4px; padding: 3px;
-}
-.divCart-one{
-    background:  #f5ead0;border:1px solid #000000;
-    height: 35%;margin-bottom: 55px;padding: 3px;
-}
-#divCart a{
-    color: #000000;margin: 30px;
-}
-.name-user{
-    height: 10vh;
-    border:1px solid #000000 !important;
-    width: 100%;
-    padding: 18px;
-    background: #93a5cf;
-    color: black;
-}
-.name-user div{
-    width: 300px;
-}
-.name-user button{
-    border:0.5px solid #000000;
-    color: black;
-    width: 70px;
-    border-radius: 4px;
-    padding: 10px;
-    margin-top: -23px;
-    background: #fc891c;
-    float: right;transition: 0.4s;
-}
-.name-user button:hover{
-    transform: scale(0.9);transition: 0.4s;
-    background:#faa452;
 }
