@@ -127,11 +127,6 @@ function addToDomOfProductID(objectP) {
             titleProductQuantity.innerHTML = "<b>Product Quantity : </b>" + (objectP.Quantity - idOfField.value);
             var productIndex = getIndexOfArray(objectP._id);
             productObjArrayForId[productIndex].Quantity = objectP.Quantity - idOfField.value;
-            // if (Object.keys(userCart).length) {
-            //     console.log(userCart);
-            //     userCart = (returnUpdatedCartObj((productObjArrayForId[productIndex]), idOfField.value), userSession.Email);
-            // }
-            //else {
                 let index = getIndexOfProductInCart(objectP._id);
                 if ( index == -1) {
                     if (!userCart.length)
@@ -145,7 +140,6 @@ function addToDomOfProductID(objectP) {
                 else {
                     userCart[0].Product[index].Quantity = parseInt(parseInt(userCart[0].Product[index].Quantity) + parseInt(idOfField.value));
                 }
-            //}
             storeProductsAddedToCart();
             storeProducts(objectP);
             idOfField.value = "";

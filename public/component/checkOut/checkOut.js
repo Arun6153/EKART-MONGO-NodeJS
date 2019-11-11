@@ -15,27 +15,27 @@ var userSession ;
 function updateEverything()
 {
     userSession  = JSON.parse(sessionStorage.getItem("userSessionKey"));
-    getStoredProducts();
+    document.getElementById("aUserName").innerHTML = ""+ userSession.Name;
+    getStoredProducts(userSession.Email);
     billFunction(billForCart);
-    getOriginalStoredProducts();
-    document.getElementById("aUserName").innerHTML = ""+ userSession.UserName;
+    // getOriginalStoredProducts();
 }
 /////////////////////////////////////////////////////
-function getOriginalStoredProducts() {
+// function getOriginalStoredProducts() {
 
-    originalCartXttp.open("GET","http://localhost:3000/getNewProduct");
-    originalCartXttp.send();
-    originalCartXttp.onreadystatechange = function(){
-        if(originalCartXttp.status == 200 && originalCartXttp.readyState == 4)
-        {
-            originalProduct_arrayObject = JSON.parse(originalCartXttp.responseText);
-            originalProduct_arrayObject = originalProduct_arrayObject.product;
-            if(isUserExists(userSession.EmailId) != -1){
-                cartItemCount.innerHTML = "Items in cart : " + cartRawProducts[isUserExists(userSession.EmailId)].product.length;
-            }
-        }
-    };
-}
+//     originalCartXttp.open("GET","http://localhost:3000/getNewProduct");
+//     originalCartXttp.send();
+//     originalCartXttp.onreadystatechange = function(){
+//         if(originalCartXttp.status == 200 && originalCartXttp.readyState == 4)
+//         {
+//             originalProduct_arrayObject = JSON.parse(originalCartXttp.responseText);
+//             originalProduct_arrayObject = originalProduct_arrayObject.product;
+//             if(isUserExists(userSession.EmailId) != -1){
+//                 cartItemCount.innerHTML = "Items in cart : " + cartRawProducts[isUserExists(userSession.EmailId)].product.length;
+//             }
+//         }
+//     };
+// }
 function storeOriginalStoredProducts(product){
     console.log("reached");
     let prodct = {product:product};
@@ -52,18 +52,18 @@ function storeProducts(products) {
    cartXttp.setRequestHeader("Content-Type","application/JSON");
    cartXttp.send(stringCart);
 }
-function getStoredProducts() {
-    productXttp.open("GET","http://localhost:3000/getCart");
-    productXttp.send();
-    productXttp.onreadystatechange = function(){
-        if(productXttp.readyState == 4 && productXttp.status == 200)
-        {
+function getStoredProducts(Email) {
+    productXttp.open("POST", "http://localhost:3000/getCart");
+    productXttp.setRequestHeader("Content-Type", "application/json");
+    productXttp.send(JSON.stringify({ Email: Email }));
+    productXttp.onreadystatechange = function () {
+        if (productXttp.readyState == 4 && productXttp.status == 200) {
             cartRawProducts = JSON.parse(productXttp.responseText);
-            cartRawProducts = cartRawProducts.cart;
-            var len = cartRawProducts[0].product.length;
-            userIndex =isUserExists(userSession.EmailId);
-            for(var i=0;i<len;i++){
-                addToDomOfProduct(cartRawProducts[userIndex].product[i]);
+            if (cartRawProducts.length != 0) {
+                var len = cartRawProducts[0].Product.length;
+                for (var i = 0; i < len; i++) {
+                    addToDomOfProduct(cartRawProducts[0].Product[i]);
+                }
             }
         }
     };
@@ -87,7 +87,7 @@ function saveEverything()
 }
 function addToDomOfProduct(objectP)
 {
-    var userId = isUserExists(userSession.EmailId);
+    var userId = 0;
     var divForProduct = document.createElement("div");
     divCartList.appendChild(divForProduct);
     divForProduct.style.width       = "100%";
@@ -142,9 +142,9 @@ function addToDomOfProduct(objectP)
         storeProducts(cartRawProducts);
         originalProduct_arrayObject[findProductInProducts(target.parentNode.childNodes[0].childNodes[1].nodeValue)].Quantity++;
         storeOriginalStoredProducts(originalProduct_arrayObject);
-        cartItemCount.innerHTML = "Items in a cart :"+cartRawProducts[userId].product.length;
+        cartItemCount.innerHTML = "Items in a cart :"+cartRawProducts[userId].Product.length;
     }); 
-    cartItemCount.innerHTML = "Items in a cart :"+cartRawProducts[userId].product.length;
+    cartItemCount.innerHTML = "Items in a cart :"+cartRawProducts[userId].Product.length;
     ////// Bill For The Cart ///////
     billForCart+=objectP.Quantity*objectP.Price;
     billFunction(billForCart);
