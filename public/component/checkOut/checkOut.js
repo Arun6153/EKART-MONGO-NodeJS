@@ -5,10 +5,11 @@ var billForCart = 0;
 var originalProduct_arrayObject = [];
 var userIndex;
 
-//////// XHttp request  and session/////////
-var productXHttp = new XMLHttpRequest();
-var cartXHttp = new XMLHttpRequest();
-var originalCartXHttp = new XMLHttpRequest();
+//////// Xttp request  and session/////////
+var productXttp = new XMLHttpRequest();
+var originalCartXttp = new XMLHttpRequest();
+var originalCartXttpGet = new XMLHttpRequest();
+var cartXttp = new XMLHttpRequest();
 var userSession ;
 
 ///////////////////////////////
@@ -18,51 +19,50 @@ function updateEverything()
     document.getElementById("aUserName").innerHTML = ""+ userSession.Name;
     getStoredProducts(userSession.Email);
     billFunction(billForCart);
-    // getOriginalStoredProducts();
+    getOriginalStoredProducts();
 }
 /////////////////////////////////////////////////////
-// function getOriginalStoredProducts() {
+function getOriginalStoredProducts() {
 
-//     originalCartXHttp.open("GET","http://localhost:3000/getNewProduct");
-//     originalCartXHttp.send();
-//     originalCartXHttp.onreadystatechange = function(){
-//         if(originalCartXHttp.status == 200 && originalCartXHttp.readyState == 4)
-//         {
-//             originalProduct_arrayObject = JSON.parse(originalCartXHttp.responseText);
-//             originalProduct_arrayObject = originalProduct_arrayObject.product;
-//             if(isUserExists(userSession.EmailId) != -1){
-//                 cartItemCount.innerHTML = "Items in cart : " + cartRawProducts[isUserExists(userSession.EmailId)].product.length;
-//             }
-//         }
-//     };
-// }
+    originalCartXttpGet.open("GET","http://localhost:3000/getNewProduct");
+    originalCartXttpGet.send();
+    originalCartXttpGet.onreadystatechange = function(){
+        if(originalCartXttpGet.status == 200 && originalCartXttpGet.readyState == 4)
+        {
+            originalProduct_arrayObject = JSON.parse(originalCartXttpGet.responseText);
+            originalProduct_arrayObject = originalProduct_arrayObject.product;
+            if(isUserExists(userSession.EmailId) != -1){
+                cartItemCount.innerHTML = "Items in cart : " + cartRawProducts[isUserExists(userSession.EmailId)].product.length;
+            }
+        }
+    };
+}
 function storeOriginalStoredProducts(product){
-    console.log("reached");
-    let prodct = {product:product};
-   originalCartXHttp.open("POST","http://localhost:3000/postNewProduct");
+   let prodct = {product:product};
+   originalCartXttp.open("POST","http://localhost:3000/postNewProduct");
    var stringproduct = JSON.stringify(prodct);
-   originalCartXHttp.setRequestHeader("Content-Type","application/JSON");
-   originalCartXHttp.send(stringproduct);
+   originalCartXttp.setRequestHeader("Content-Type","application/JSON");
+   originalCartXttp.send(stringproduct);
 }
 /////////////////////////////////////////////////////
 function storeProducts(products) {
    let cart = {cart:products};
-   cartXHttp.open("POST","http://localhost:3000/postCart");
+   cartXttp.open("POST","http://localhost:3000/postCart");
    var stringCart = JSON.stringify(cart);
-   cartXHttp.setRequestHeader("Content-Type","application/JSON");
-   cartXHttp.send(stringCart);
+   cartXttp.setRequestHeader("Content-Type","application/JSON");
+   cartXttp.send(stringCart);
 }
 function getStoredProducts(Email) {
-    cartXHttp.open("POST", "http://localhost:3000/getCart");
-    cartXHttp.setRequestHeader("Content-Type", "application/json");
-    cartXHttp.send(JSON.stringify({ Email: Email }));
-    cartXHttp.onreadystatechange = function () {
-        if (cartXHttp.readyState == 4 && cartXHttp.status == 200) {
-            cartRawProducts = JSON.parse(cartXHttp.responseText);
-            if (cartRawProducts.Product.length != 0) {
-                var len = cartRawProducts.Product.length;
+    productXttp.open("POST", "http://localhost:3000/getCart");
+    productXttp.setRequestHeader("Content-Type", "application/json");
+    productXttp.send(JSON.stringify({ Email: Email }));
+    productXttp.onreadystatechange = function () {
+        if (productXttp.readyState == 4 && productXttp.status == 200) {
+            cartRawProducts = JSON.parse(productXttp.responseText);
+            if (cartRawProducts.length != 0) {
+                var len = cartRawProducts[0].Product.length;
                 for (var i = 0; i < len; i++) {
-                    addToDomOfProduct(cartRawProducts.Product[i]);
+                    addToDomOfProduct(cartRawProducts[0].Product[i]);
                 }
             }
         }
@@ -99,7 +99,7 @@ function addToDomOfProduct(objectP)
     var productQuantity = document.createElement("label");
     var productPrice    = document.createElement("label");
 
-    productId.innerHTML = "<b>P-ID : </b>"+objectP.ProductID;
+    productId.innerHTML = "<b>P-ID : </b>"+objectP.ProductId;
     divForProduct.appendChild(productId);
     addSpaceLine(divForProduct);
     productName.innerHTML = "<b>Name : </b>"+objectP.Name;
@@ -116,40 +116,38 @@ function addToDomOfProduct(objectP)
     deleteBtn.setAttribute("type", "button");
     deleteBtn.setAttribute("value", "Delete");
     divForProduct.appendChild(deleteBtn);
-
     /////////// Delete operation ////////
+    
     deleteBtn.addEventListener("click",function(e){
         var target = e.target;
         var productNo = findProduct(target.parentNode.childNodes[0].childNodes[1].nodeValue);
-        var product = cartRawProducts.Product[productNo];
-        console.log(product);
+        var product = cartRawProducts[userId].Product[findProduct(target.parentNode.childNodes[0].childNodes[1].nodeValue)]
         if(product.Quantity == 1){
-            cartRawProducts.Product.splice(productNo,1);
+            cartRawProducts[userId].Product.splice(productNo,1);
             target.parentNode.remove(target);
         }
         else{
-            cartRawProducts.Product[productNo].Quantity--;
+            cartRawProducts[userId].Product[productNo].Quantity--;
             productQuantity.innerHTML = "<b>Quantity :</b>"+objectP.Quantity+" units";
         }
         billForCart-=objectP.Price;
         billFunction(billForCart);
-        console.log(cartRawProducts);
         storeProducts(cartRawProducts);
         originalProduct_arrayObject[findProductInProducts(target.parentNode.childNodes[0].childNodes[1].nodeValue)].Quantity++;
         storeOriginalStoredProducts(originalProduct_arrayObject);
-        cartItemCount.innerHTML = "Items in a cart :"+cartRawProducts.Product.length;
+        cartItemCount.innerHTML = "Items in a cart :"+cartRawProducts[userId].Product.length;
     }); 
-    cartItemCount.innerHTML = "Items in a cart :"+cartRawProducts.Product.length;
+    cartItemCount.innerHTML = "Items in a cart :"+cartRawProducts[userId].Product.length;
     ////// Bill For The Cart ///////
     billForCart+=objectP.Quantity*objectP.Price;
     billFunction(billForCart);
 }
 
 function findProduct(id){
-    console.log(id)
-    for(var i=0;i<cartRawProducts.Product.length;i++)
+    var userId = 0;
+    for(var i=0;i<cartRawProducts[userId].Product.length;i++)
     {
-        if(cartRawProducts.Product[i].ProductID  == id)
+        if(cartRawProducts[userId].Product[i].ProductId  == id)
         {
             return i;
         }
@@ -169,17 +167,17 @@ function findProductInProducts(id){
     return 0;
 }
 
-function isUserExists(id)
-{
-    for(var i=0;i<cartRawProducts.length;i++)
-    {
-        if(cartRawProducts[i].Email == id)
-        {
-            return i;
-        }
-    }
-    return -1;
-}
+// function isUserExists(id)
+// {
+//     for(var i=0;i<cartRawProducts.length;i++)
+//     {
+//         if(cartRawProducts[i].Email == id)
+//         {
+//             return i;
+//         }
+//     }
+//     return -1;
+// }
 
 function billFunction(bill)
 {
