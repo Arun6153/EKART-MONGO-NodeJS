@@ -5,10 +5,10 @@ var billForCart = 0;
 var originalProduct_arrayObject = [];
 var userIndex;
 
-//////// Xttp request  and session/////////
-var productXttp = new XMLHttpRequest();
-var originalCartXttp = new XMLHttpRequest();
-var cartXttp = new XMLHttpRequest();
+//////// XHttp request  and session/////////
+var productXHttp = new XMLHttpRequest();
+var cartXHttp = new XMLHttpRequest();
+var originalCartXHttp = new XMLHttpRequest();
 var userSession ;
 
 ///////////////////////////////
@@ -23,12 +23,12 @@ function updateEverything()
 /////////////////////////////////////////////////////
 // function getOriginalStoredProducts() {
 
-//     originalCartXttp.open("GET","http://localhost:3000/getNewProduct");
-//     originalCartXttp.send();
-//     originalCartXttp.onreadystatechange = function(){
-//         if(originalCartXttp.status == 200 && originalCartXttp.readyState == 4)
+//     originalCartXHttp.open("GET","http://localhost:3000/getNewProduct");
+//     originalCartXHttp.send();
+//     originalCartXHttp.onreadystatechange = function(){
+//         if(originalCartXHttp.status == 200 && originalCartXHttp.readyState == 4)
 //         {
-//             originalProduct_arrayObject = JSON.parse(originalCartXttp.responseText);
+//             originalProduct_arrayObject = JSON.parse(originalCartXHttp.responseText);
 //             originalProduct_arrayObject = originalProduct_arrayObject.product;
 //             if(isUserExists(userSession.EmailId) != -1){
 //                 cartItemCount.innerHTML = "Items in cart : " + cartRawProducts[isUserExists(userSession.EmailId)].product.length;
@@ -39,30 +39,30 @@ function updateEverything()
 function storeOriginalStoredProducts(product){
     console.log("reached");
     let prodct = {product:product};
-   originalCartXttp.open("POST","http://localhost:3000/postNewProduct");
+   originalCartXHttp.open("POST","http://localhost:3000/postNewProduct");
    var stringproduct = JSON.stringify(prodct);
-   originalCartXttp.setRequestHeader("Content-Type","application/JSON");
-   originalCartXttp.send(stringproduct);
+   originalCartXHttp.setRequestHeader("Content-Type","application/JSON");
+   originalCartXHttp.send(stringproduct);
 }
 /////////////////////////////////////////////////////
 function storeProducts(products) {
    let cart = {cart:products};
-   cartXttp.open("POST","http://localhost:3000/postCart");
+   cartXHttp.open("POST","http://localhost:3000/postCart");
    var stringCart = JSON.stringify(cart);
-   cartXttp.setRequestHeader("Content-Type","application/JSON");
-   cartXttp.send(stringCart);
+   cartXHttp.setRequestHeader("Content-Type","application/JSON");
+   cartXHttp.send(stringCart);
 }
 function getStoredProducts(Email) {
-    productXttp.open("POST", "http://localhost:3000/getCart");
-    productXttp.setRequestHeader("Content-Type", "application/json");
-    productXttp.send(JSON.stringify({ Email: Email }));
-    productXttp.onreadystatechange = function () {
-        if (productXttp.readyState == 4 && productXttp.status == 200) {
-            cartRawProducts = JSON.parse(productXttp.responseText);
-            if (cartRawProducts.length != 0) {
-                var len = cartRawProducts[0].Product.length;
+    cartXHttp.open("POST", "http://localhost:3000/getCart");
+    cartXHttp.setRequestHeader("Content-Type", "application/json");
+    cartXHttp.send(JSON.stringify({ Email: Email }));
+    cartXHttp.onreadystatechange = function () {
+        if (cartXHttp.readyState == 4 && cartXHttp.status == 200) {
+            cartRawProducts = JSON.parse(cartXHttp.responseText);
+            if (cartRawProducts.Product.length != 0) {
+                var len = cartRawProducts.Product.length;
                 for (var i = 0; i < len; i++) {
-                    addToDomOfProduct(cartRawProducts[0].Product[i]);
+                    addToDomOfProduct(cartRawProducts.Product[i]);
                 }
             }
         }
@@ -116,18 +116,19 @@ function addToDomOfProduct(objectP)
     deleteBtn.setAttribute("type", "button");
     deleteBtn.setAttribute("value", "Delete");
     divForProduct.appendChild(deleteBtn);
+
     /////////// Delete operation ////////
-    
     deleteBtn.addEventListener("click",function(e){
         var target = e.target;
         var productNo = findProduct(target.parentNode.childNodes[0].childNodes[1].nodeValue);
-        var product = cartRawProducts[userId].product[findProduct(target.parentNode.childNodes[0].childNodes[1].nodeValue)]
+        var product = cartRawProducts.Product[productNo];
+        console.log(product);
         if(product.Quantity == 1){
-            cartRawProducts[userId].product.splice(productNo,1);
+            cartRawProducts.Product.splice(productNo,1);
             target.parentNode.remove(target);
         }
         else{
-            cartRawProducts[userId].product[productNo].Quantity--;
+            cartRawProducts.Product[productNo].Quantity--;
             productQuantity.innerHTML = "<b>Quantity :</b>"+objectP.Quantity+" units";
         }
         billForCart-=objectP.Price;
@@ -136,19 +137,19 @@ function addToDomOfProduct(objectP)
         storeProducts(cartRawProducts);
         originalProduct_arrayObject[findProductInProducts(target.parentNode.childNodes[0].childNodes[1].nodeValue)].Quantity++;
         storeOriginalStoredProducts(originalProduct_arrayObject);
-        cartItemCount.innerHTML = "Items in a cart :"+cartRawProducts[userId].Product.length;
+        cartItemCount.innerHTML = "Items in a cart :"+cartRawProducts.Product.length;
     }); 
-    cartItemCount.innerHTML = "Items in a cart :"+cartRawProducts[userId].Product.length;
+    cartItemCount.innerHTML = "Items in a cart :"+cartRawProducts.Product.length;
     ////// Bill For The Cart ///////
     billForCart+=objectP.Quantity*objectP.Price;
     billFunction(billForCart);
 }
 
 function findProduct(id){
-    var userId = isUserExists(userSession.EmailId);
-    for(var i=0;i<cartRawProducts[userId].product.length;i++)
+    console.log(id)
+    for(var i=0;i<cartRawProducts.Product.length;i++)
     {
-        if(cartRawProducts[userId].product[i].ProductID  == id)
+        if(cartRawProducts.Product[i].ProductID  == id)
         {
             return i;
         }

@@ -4,22 +4,23 @@ var userCart = [];
 var oldCheck = true;
 var cartListCount = document.getElementById("itemCount");
 ////////////// AJAX //////////////////
-var cartXttp = new XMLHttpRequest();
-var productXttp = new XMLHttpRequest();
-var updateProductXttp = new XMLHttpRequest();
-var getCartXttp = new XMLHttpRequest();
-var cartNewXttp = new XMLHttpRequest();
+var cartXHttp = new XMLHttpRequest();
+var pushCart = new XMLHttpRequest();
+var productXHttp = new XMLHttpRequest();
+var updateProductXHttp = new XMLHttpRequest();
+var getCartXHttp = new XMLHttpRequest();
+var cartNewXHttp = new XMLHttpRequest();
 var userSession = JSON.parse(sessionStorage.getItem("userSessionKey"));
 
 
 /////////////////////////////////////
 function updateEverything() {
-    productXttp.open("GET", "http://localhost:3000/getProduct");
-    productXttp.setRequestHeader("Content-Type", "application/json");
-    productXttp.send();
-    productXttp.onreadystatechange = function () {
-        if (productXttp.readyState == 4 && productXttp.status == 200) {
-            productObjArrayForId = JSON.parse(productXttp.responseText);
+    productXHttp.open("GET", "http://localhost:3000/getProduct");
+    productXHttp.setRequestHeader("Content-Type", "application/json");
+    productXHttp.send();
+    productXHttp.onreadystatechange = function () {
+        if (productXHttp.readyState == 4 && productXHttp.status == 200) {
+            productObjArrayForId = JSON.parse(productXHttp.responseText);
             productObjArrayForId.forEach(function (prod) {
                 addToDomOfProductID(prod);
             });
@@ -30,18 +31,18 @@ function updateEverything() {
 }
 
 function getUserCartFromLocalStorage(Email) {
-    getCartXttp.open("POST", "http://localhost:3000/getCart");
-    getCartXttp.setRequestHeader("Content-Type", "application/json");
-    getCartXttp.send(JSON.stringify({ Email }));
-    getCartXttp.onreadystatechange = function () {
-        if (getCartXttp.status == 200 && getCartXttp.readyState == 4) {
-            userCart = JSON.parse(getCartXttp.responseText);
-            console.log(userCart)
-            if (!userCart.length) {
+    getCartXHttp.open("POST", "http://localhost:3000/getCart");
+    getCartXHttp.setRequestHeader("Content-Type", "application/json");
+    getCartXHttp.send(JSON.stringify({ Email }));
+    getCartXHttp.onreadystatechange = function () {
+        if (getCartXHttp.status == 200 && getCartXHttp.readyState == 4) {
+            userCart = JSON.parse(getCartXHttp.responseText);
+            console.log(userCart.Product);
+            if (!userCart.Product.length) {
                 oldCheck = false;
             }
             else {
-                cartListCount.innerHTML = userCart[0].Product.length;
+                cartListCount.innerHTML = userCart.Product.length;
             }
         }
     };
@@ -49,23 +50,24 @@ function getUserCartFromLocalStorage(Email) {
 
 function storeProducts(product) {
     var Product = product;
-    updateProductXttp.open("POST", "http://localhost:3000/updateProduct");
-    updateProductXttp.setRequestHeader("Content-Type", "application/json");
-    updateProductXttp.send(JSON.stringify(Product));
+    updateProductXHttp.open("POST", "http://localhost:3000/updateProduct");
+    updateProductXHttp.setRequestHeader("Content-Type", "application/json");
+    updateProductXHttp.send(JSON.stringify(Product));
 }
 
-function storeProductsAddedToCart() {
+function storeProductsAddedToCart(userCart) {
+    console.log(userCart);
     var cart = userCart;
     if(oldCheck){
-        cartXttp.open("POST", "http://localhost:3000/postCart");
-        cartXttp.setRequestHeader("Content-Type", "application/JSON");
-        cartXttp.send(JSON.stringify(cart));
+        pushCart.open("POST", "http://localhost:3000/postCart");
+        pushCart.setRequestHeader("Content-Type", "application/JSON");
+        pushCart.send(JSON.stringify(cart));
     }
     else{
         oldCheck = true;
-        cartNewXttp.open("POST", "http://localhost:3000/postCartForNew");
-        cartNewXttp.setRequestHeader("Content-Type", "application/JSON");
-        cartNewXttp.send(JSON.stringify(cart[cart.length-1]));
+        cartNewXHttp.open("POST", "http://localhost:3000/postCartForNew");
+        cartNewXHttp.setRequestHeader("Content-Type", "application/JSON");
+        cartNewXHttp.send(JSON.stringify(cart[cart.length-1]));
     }
 }
 
@@ -104,8 +106,8 @@ function addToDomOfProductID(objectP) {
     cartBtn.setAttribute("value", "Add To Cart  >>");
     divForProduct.appendChild(cartBtn);
     divForProduct.appendChild(fieldProductQuantity);
-    ////////// Add To Button Operation /////
 
+    ////////// Add To Button Operation /////
     cartBtn.addEventListener("click", function () {
         var idOfField = document.getElementById("Q" + objectP._id);
         if (idOfField.value == "") {
@@ -118,21 +120,22 @@ function addToDomOfProductID(objectP) {
         else {
             titleProductQuantity.innerHTML = "<b>Product Quantity : </b>" + (objectP.Quantity - idOfField.value);
             var productIndex = getIndexOfArray(objectP._id);
+            console.log(productIndex);
             productObjArrayForId[productIndex].Quantity = objectP.Quantity - idOfField.value;
-                let index = getIndexOfProductInCart(objectP._id);
+            let index = getIndexOfProductInCart(objectP._id);
                 if ( index == -1) {
-                    if (!userCart.length)
+                    if (!userCart.Product.length)
                         userCart.push(returnUpdatedCartObj((productObjArrayForId[productIndex]), idOfField.value, userSession.Email));
                     else {
                         var obj = returnUpdatedCartObj((productObjArrayForId[productIndex]), idOfField.value, userSession.Email)
-                        userCart[0].Product.push(obj.Product[0]);
+                        userCart.Product.push(obj.Product[0]);
                     }
                     cartListCount.innerHTML = parseInt(parseInt(cartListCount.innerHTML) + 1);
                 }
                 else {
-                    userCart[0].Product[index].Quantity = parseInt(parseInt(userCart[0].Product[index].Quantity) + parseInt(idOfField.value));
+                    userCart.Product[index].Quantity = parseInt(parseInt(userCart.Product[index].Quantity) + parseInt(idOfField.value));
                 }
-            storeProductsAddedToCart();
+            storeProductsAddedToCart(userCart);
             storeProducts(objectP);
             idOfField.value = "";
         }
@@ -160,10 +163,10 @@ function getIndexOfArray(id) {
 }
 
 function getIndexOfProductInCart(id) {
-    if (!userCart.length)
+    if (!userCart.Product.length)
         return -1
-    for (var i = 0; i < userCart[0].Product.length; i++)
-        if (userCart[0].Product[i].ProductId == id) {
+    for (var i = 0; i < userCart.Product.length; i++)
+        if (userCart.Product[i].ProductId == id) {
             return i;
         }
     return -1;

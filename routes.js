@@ -47,7 +47,7 @@ router.get('/getProduct', (req, res) => {
             res.end(JSON.stringify(data));
         }).catch((err) => {
             console.log(err);
-            res.end("[]");
+            res.end();
         })
 });
 router.post('/postProduct', (req, res) => {
@@ -119,15 +119,11 @@ router.post('/getCart', (req, res) => {
         Email: req.body.Email
     })
         .then((data) => {
-            if (data.length) {
-                res.end(JSON.stringify(data));
-            }
-            else
-                res.end("[]");
+            res.send(data[0]);
         })
         .catch((err) => {
             console.log(err);
-            res.end("[]");
+            res.end();
         });
 });
 router.post('/postCartForNew', (req, res) => {
@@ -145,20 +141,18 @@ router.post('/postCartForNew', (req, res) => {
 });
 
 router.post('/postCart', (req, res) => {
-    for (var i = 0; i < req.body.length; i++) {
-        console.log(req.body[i].Product)
-        cart.updateOne({
-            Email: req.body[i].Email
+        console.log("hey");
+        cart.updateMany({
+            Email: req.body.Email
         }, {
-            Product: req.body[0].Product
+            Product: req.body.Product
         }).then(() => {
             console.log('done');
             res.send({ bool: true });
         }).catch((err) => {
             console.log(err);
-            res.send({ bool: false });
+            res.end();
         });
-    }
 });
 
 router.get('/updateCart', (req, res) => {
@@ -201,7 +195,18 @@ router.get('/updateCart', (req, res) => {
     })
 });
 });
-
+router.post('/deleteCart',(req,res)=>{
+    cart.update({
+        Email:req.body.Email
+    },{
+        Product:[]
+    }).then(()=>{
+        res.send({bool:true});
+    })
+    .catch(()=>{
+        res.end();
+    })
+})
 
 ////////////////////////
 router.get('/getOriginalCart', (req, res) => {
