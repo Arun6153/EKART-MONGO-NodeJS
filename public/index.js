@@ -47,16 +47,17 @@ function addPaginationButtons() {
         $('#paginationButtons').remove();
     }
     else {
+        $('#paginationButtons').remove();
         if (currentPage == 0)
-            $("#divListProducts").append("<div id='paginationButtons'><button disabled type='button'>Previous</button>\
+            $("#divPaginationButtons").append("<div id='paginationButtons'><button disabled type='button'>Previous</button>\
     <button style='margin-left:5px' onclick='loadNextUsers()' type='button'>Next</button><br><br></div>");
 
         else if (currentPage + 10 > product.length)
-            $("#divListProducts").append("<div id='paginationButtons'><button type='button' onclick='loadPreviousUsers()'>Previous</button>\
+            $("#divPaginationButtons").append("<div id='paginationButtons'><button type='button' onclick='loadPreviousUsers()'>Previous</button>\
     <button disabled style='margin-left:5px' onclick='loadNextUsers()' type='button'>Next</button><br><br></div>");
 
         else
-            $("#divListProducts").append("<div id='paginationButtons'><button type='button' onclick='loadPreviousUsers()'>Previous</button>\
+            $("#divPaginationButtons").append("<div id='paginationButtons'><button type='button' onclick='loadPreviousUsers()'>Previous</button>\
     <button style='margin-left:5px' type='button'>Next</button><br><br></div>");
     }
 }
@@ -246,7 +247,6 @@ function addToDomOfProduct(objectP) {
 function removeFromProductsArray(id) {
     for (var i = 0; i < product.length; i++) {
         if (product[i]._id == id) {
-            console.log(product[i])
             deleteProduct(product[i]);
             product.splice(i, 1);
             break;
