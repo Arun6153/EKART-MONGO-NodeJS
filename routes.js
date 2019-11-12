@@ -44,7 +44,7 @@ router.post("/postUser", function (req, res) {
 router.get('/getProduct', (req, res) => {
     product.find({})
         .then((data) => {
-            res.end(JSON.stringify(data));
+            res.send(data);
         }).catch((err) => {
             console.log(err);
             res.end();
@@ -75,11 +75,11 @@ router.post('/updateProduct', (req, res) => {
             Quantity: req.body.Quantity,
             Price: req.body.Price,
         }).then(() => {
-            res.end("[]");
+            res.send({bool:true});
         })
         .catch((err) => {
             console.log(err);
-            res.end("[]");
+            res.end({bool:false});
         });
     res.end();
 });
@@ -141,25 +141,25 @@ router.post('/postCartForNew', (req, res) => {
 });
 
 router.post('/postCart', (req, res) => {
-        console.log("hey");
-        cart.updateMany({
-            Email: req.body.Email
-        }, {
-            Product: req.body.Product
-        }).then(() => {
-            console.log('done');
-            res.send({ bool: true });
-        }).catch((err) => {
-            console.log(err);
-            res.end();
-        });
+    console.log("hey");
+    cart.updateMany({
+        Email: req.body.Email
+    }, {
+        Product: req.body.Product
+    }).then(() => {
+        console.log('done');
+        res.send({ bool: true });
+    }).catch((err) => {
+        console.log(err);
+        res.end();
+    });
 });
 
 router.get('/updateCart', (req, res) => {
 
     // "Email":"sarun6153@gmail.com",
-	// "Quantity":"2",
-	// "ProductId":"5d90eae1b84d903f806b5c6c"
+    // "Quantity":"2",
+    // "ProductId":"5d90eae1b84d903f806b5c6c"
 
     cart.find({
         Email: req.body.Email
@@ -174,38 +174,38 @@ router.get('/updateCart', (req, res) => {
                 index = i;
             }
         }
-    console.log(data.Product[index].Quantity);
-    let Quantity = data.Product[index].Quantity - req.body.Quantity;
-    console.log(Quantity);
+        console.log(data.Product[index].Quantity);
+        let Quantity = data.Product[index].Quantity - req.body.Quantity;
+        console.log(Quantity);
+        cart.update({
+            Email: req.body.Email,
+            Product: { $elemMatch: { Quantity: { $eq: data.Product[index].Quantity }, ProductId: { $eq: req.body.ProductId } } }
+        }, {
+            $set: {
+                "Product.$.Quantity": Quantity
+            }
+        }).then(() => {
+            res.send({ bool: true })
+        }).catch((Err) => {
+            console.log(Err);
+            res.send({ bool: false })
+        }).catch(err => {
+            console.log(err);
+            res.end();
+        })
+    });
+});
+router.post('/deleteCart', (req, res) => {
     cart.update({
-        Email: req.body.Email,
-        Product:{$elemMatch:{Quantity:{$eq:data.Product[index].Quantity},ProductId:{$eq:req.body.ProductId}}}
+        Email: req.body.Email
     }, {
-        $set: {
-            "Product.$.Quantity": Quantity
-        }
+        Product: []
     }).then(() => {
-        res.send({ bool: true })
-    }).catch((Err) => {
-        console.log(Err);
-        res.send({ bool: false })
-    }).catch(err => {
-        console.log(err);
-        res.end();
+        res.send({ bool: true });
     })
-});
-});
-router.post('/deleteCart',(req,res)=>{
-    cart.update({
-        Email:req.body.Email
-    },{
-        Product:[]
-    }).then(()=>{
-        res.send({bool:true});
-    })
-    .catch(()=>{
-        res.end();
-    })
+        .catch(() => {
+            res.end();
+        })
 })
 
 ////////////////////////
