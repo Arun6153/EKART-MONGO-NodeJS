@@ -2,16 +2,25 @@ var aAddNewProduct = document.getElementById("aAddNewProduct");
 var divToAddProduct = document.getElementById("divToAddProduct");
 var divListProducts = document.getElementById("divListProducts");
 var product = [];
-var productXttp = new XMLHttpRequest();
+var getStoreProductXttp = new XMLHttpRequest();
+var postStoreProductXttp = new XMLHttpRequest();
+var updateProductXttp = new XMLHttpRequest();
+var deleteProductXttp = new XMLHttpRequest();
+var currentPage = 0;
 
 window.updateEverything = function () {
     getStoredProducts();
-    productXttp.onreadystatechange = function () {
-        if (productXttp.readyState == 4 && productXttp.status == 200) {
-            product = JSON.parse(productXttp.responseText);
+    getStoreProductXttp.onreadystatechange = function () {
+        if (getStoreProductXttp.readyState == 4 && getStoreProductXttp.status == 200) {
+            product = JSON.parse(getStoreProductXttp.responseText);
             if (product) {
-                for (var i = 0; i < product.length; i++) {
-                    addToDomOfProduct(product[i]);
+                if(product.length > 10) {
+                    pagination();
+                }
+                else {
+                    for (var i = 0; i < product.length; i++) {
+                        addToDomOfProduct(product[i]);
+                    }
                 }
             }
             else {
@@ -20,25 +29,66 @@ window.updateEverything = function () {
         }
     }
 }
+
+function loadNextUsers() {
+    currentPage+=10;
+    $("#divListProducts").empty();
+    pagination();
+}
+
+function loadPreviousUsers() {
+    currentPage-=10;
+    $("#divListProducts").empty();
+    pagination();
+}
+
+function addPaginationButtons() {
+    if (product.length < 11) {
+        $('#paginationButtons').remove();
+    }
+    else {
+        if (currentPage == 0)
+            $("#divListProducts").append("<div id='paginationButtons'><button disabled type='button'>Previous</button>\
+    <button style='margin-left:5px' onclick='loadNextUsers()' type='button'>Next</button><br><br></div>");
+
+        else if (currentPage + 10 > product.length)
+            $("#divListProducts").append("<div id='paginationButtons'><button type='button' onclick='loadPreviousUsers()'>Previous</button>\
+    <button disabled style='margin-left:5px' onclick='loadNextUsers()' type='button'>Next</button><br><br></div>");
+
+        else
+            $("#divListProducts").append("<div id='paginationButtons'><button type='button' onclick='loadPreviousUsers()'>Previous</button>\
+    <button style='margin-left:5px' type='button'>Next</button><br><br></div>");
+    }
+}
+
+function pagination() {
+    for(var i = currentPage; i < currentPage+10; i++) {
+        if(i == product.length)
+            break;
+        addToDomOfProduct(product[i]);
+    }
+    addPaginationButtons();
+}
+
 ////// Product operation ////////////////
 function storeProducts(product) {
-    productXttp.open("POST", "http://localhost:3000/postProduct");
-    productXttp.setRequestHeader("Content-Type", "application/json");
-    productXttp.send(JSON.stringify(product));
+    postStoreProductXttp.open("POST", "http://localhost:3000/postProduct");
+    postStoreProductXttp.setRequestHeader("Content-Type", "application/json");
+    postStoreProductXttp.send(JSON.stringify(product));
 }
 function updateProducts(product) {
-    productXttp.open("POST", "http://localhost:3000/updateProduct");
-    productXttp.setRequestHeader("Content-Type", "application/json");
-    productXttp.send(JSON.stringify(product));
+    updateProductXttp.open("POST", "http://localhost:3000/updateProduct");
+    updateProductXttp.setRequestHeader("Content-Type", "application/json");
+    updateProductXttp.send(JSON.stringify(product));
 }
 function getStoredProducts() {
-    productXttp.open("GET", "http://localhost:3000/getProduct");
-    productXttp.send();
+    getStoreProductXttp.open("GET", "http://localhost:3000/getProduct");
+    getStoreProductXttp.send();
 }
 function deleteProduct(product){
-    productXttp.open("POST", "http://localhost:3000/deleteProduct");
-    productXttp.setRequestHeader("Content-Type", "application/json");
-    productXttp.send(JSON.stringify(product));
+    deleteProductXttp.open("POST", "http://localhost:3000/deleteProduct");
+    deleteProductXttp.setRequestHeader("Content-Type", "application/json");
+    deleteProductXttp.send(JSON.stringify(product));
 }
 /////////////////////////////////////////
 
@@ -100,7 +150,13 @@ function createProductPanel(newP, index, PrId) {
             }
             else {
                 addNewProductToArray(productObject);
-                addToDomOfProduct(productObject);
+                if(product.length <= currentPage+10) {
+                    addToDomOfProduct(productObject);
+                }
+                else {
+                    addPaginationButtons();
+                    destroyPanel();
+                }
                 showPanel(aAddNewProduct);
             }
         }/////////  Edited data - update /////////
@@ -117,6 +173,12 @@ function createProductPanel(newP, index, PrId) {
 function addNewProductToArray(obj) {
     product.push(obj);
     storeProducts(obj);
+    getStoredProducts();
+    getStoreProductXttp.onreadystatechange = function () {
+        if (getStoreProductXttp.readyState == 4 && getStoreProductXttp.status == 200) {
+            product = JSON.parse(getStoreProductXttp.responseText);
+        }
+    }
 }
 function addToDomOfProduct(objectP) {
     //////////// DomProduct Div ////////////
@@ -165,6 +227,13 @@ function addToDomOfProduct(objectP) {
         var target = e.target;
         target.parentNode.remove(target);
         removeFromProductsArray(objectP._id);
+        if(product.length <= currentPage && currentPage != 0) {
+            loadPreviousUsers();
+        }
+        else {
+            destroyProductsFromDOM();
+            pagination();
+        }
     });
     ////////// Edit OPERATION /////////////
     editBtn.addEventListener("click", function (e) {
@@ -177,6 +246,7 @@ function addToDomOfProduct(objectP) {
 function removeFromProductsArray(id) {
     for (var i = 0; i < product.length; i++) {
         if (product[i]._id == id) {
+            console.log(product[i])
             deleteProduct(product[i]);
             product.splice(i, 1);
             break;
@@ -205,7 +275,11 @@ function destroyPanel() {
         divToAddProduct.removeChild(divToAddProduct.firstChild);
     }
 }
-
+function destroyProductsFromDOM() {
+    while(divListProducts.hasChildNodes()) {
+        divListProducts.removeChild(divListProducts.firstChild);
+    }
+}
 function hidePanel(hideP) {
     hideP.style.visibility = "hidden";
 }

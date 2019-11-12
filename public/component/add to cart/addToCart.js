@@ -11,7 +11,7 @@ var updateProductXHttp = new XMLHttpRequest();
 var getCartXHttp = new XMLHttpRequest();
 var cartNewXHttp = new XMLHttpRequest();
 var userSession = JSON.parse(sessionStorage.getItem("userSessionKey"));
-
+var currentPage = 0;
 
 /////////////////////////////////////
 function updateEverything() {
@@ -21,13 +21,49 @@ function updateEverything() {
     productXHttp.onreadystatechange = function () {
         if (productXHttp.readyState == 4 && productXHttp.status == 200) {
             productObjArrayForId = JSON.parse(productXHttp.responseText);
-            productObjArrayForId.forEach(function (prod) {
-                addToDomOfProductID(prod);
-            });
+            if (productObjArrayForId.length > 10) {
+                pagination();
+            }
+            else {
+                productObjArrayForId.forEach(function (prod) {
+                    addToDomOfProductID(prod);
+                });
+            }
             document.getElementById("aUserName").innerHTML = "" + userSession.Name;
             getUserCartFromLocalStorage(userSession.Email);
         }
     };
+}
+
+function loadNextUsers() {
+    currentPage+=10;
+    $("#listProductId").empty();
+    pagination();
+}
+
+function loadPreviousUsers() {
+    currentPage-=10;
+    $("#listProductId").empty();
+    pagination();
+}
+
+function pagination() {
+    for(var i = currentPage; i < currentPage+10; i++) {
+        if(i == productObjArrayForId.length)
+            break;
+        addToDomOfProductID(productObjArrayForId[i]);
+    }
+    if(currentPage == 0)
+    $("#listProductId").append("<button disabled type='button'>Previous</button>\
+    <button style='margin-left:5px' onclick='loadNextUsers()' type='button'>Next</button><br><br>");
+
+    else if(currentPage+10 > productObjArrayForId.length)
+    $("#listProductId").append("<button type='button' onclick='loadPreviousUsers()'>Previous</button>\
+    <button disabled style='margin-left:5px' onclick='loadNextUsers()' type='button'>Next</button><br><br>");
+
+    else
+    $("#listProductId").append("<button type='button' onclick='loadPreviousUsers()'>Previous</button>\
+    <button style='margin-left:5px' type='button'>Next</button><br><br>");
 }
 
 function getUserCartFromLocalStorage(Email) {
